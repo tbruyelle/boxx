@@ -18,6 +18,7 @@ enum State { SPLASH, INTRO, PLAYING, GAME_OVER }
 @onready var title_label: Node3D = $TitleLabel
 @onready var press_key_label: Label = $UI/PressKeyLabel
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
+@onready var sfx: Node = $SfxManager
 
 var state: int = State.SPLASH
 var time_remaining: float = 60.0
@@ -158,8 +159,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	match state:
 		State.SPLASH:
+			sfx.play("confirm", -4.0)
 			_enter_intro()
 		State.GAME_OVER:
+			sfx.play("confirm", -4.0)
 			_enter_splash()
 
 func _process(delta: float) -> void:
@@ -176,7 +179,9 @@ func _process(delta: float) -> void:
 			_trigger_game_over()
 
 func _on_player_moved(old_pos: Vector2i, _new_pos: Vector2i) -> void:
+	sfx.play("move", -14.0)
 	grid.destroy_cell(old_pos)
+	sfx.play("cell_fall", -6.0)
 
 func _on_player_arrived(pos: Vector2i) -> void:
 	var bonus = grid.get_cell_bonus(pos)
@@ -185,6 +190,7 @@ func _on_player_arrived(pos: Vector2i) -> void:
 		player.apply_bonus(bonus)
 
 func _on_player_fired(bullet_count: int) -> void:
+	sfx.play("fire", -8.0)
 	for i in range(bullet_count):
 		_spawn_bullet(i)
 
@@ -196,6 +202,8 @@ func _spawn_bullet(index: int) -> void:
 	add_child(bullet)
 
 func on_bullet_hit(damage: float) -> void:
+	var hit_sfx = "hit_wall" if target.target_type == "wall" else "hit_monster"
+	sfx.play(hit_sfx, -14.0)
 	target.take_damage(damage)
 
 func _on_target_hp_changed(current: float, max_val: float) -> void:
@@ -208,7 +216,12 @@ func _on_target_destroyed() -> void:
 	player.set_process_unhandled_input(false)
 
 	# Explode target
+	sfx.play("explosion", -6.0)
 	target.explode()
+	await get_tree().create_timer(0.8).timeout
+
+	# Victory jingle
+	sfx.play("victory", -2.0)
 	await get_tree().create_timer(1.0).timeout
 
 	# Next level

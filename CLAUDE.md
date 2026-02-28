@@ -33,6 +33,9 @@ ps aux | grep godot | grep -v grep | awk '{print $2}' | xargs kill 2>/dev/null; 
 ```bash
 # Regenerate music loop
 python3 /home/tom/src/boxx/assets/generate_music.py
+
+# Regenerate sound effects
+python3 /home/tom/src/boxx/assets/generate_sfx.py
 ```
 
 ## Architecture
