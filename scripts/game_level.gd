@@ -178,6 +178,15 @@ func _on_target_hp_changed(current: float, max_val: float) -> void:
 	hp_bar.value = current
 
 func _on_target_destroyed() -> void:
+	# Pause gameplay
+	state = State.INTRO
+	player.fire_timer.stop()
+	player.set_process_unhandled_input(false)
+
+	# Explode target
+	target.explode()
+	await get_tree().create_timer(1.0).timeout
+
+	# Next level
 	game_manager.complete_level()
-	await get_tree().create_timer(1.5).timeout
 	_enter_intro()

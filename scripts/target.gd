@@ -45,6 +45,22 @@ func _update_visual() -> void:
 			mat.albedo_color = Color(0.7, 0.1, 0.1)
 			mesh_instance.material_override = mat
 
+func explode() -> void:
+	var mesh_instance = $MeshInstance3D
+	if not mesh_instance:
+		return
+	# Flash white then scale up + fade out
+	if mesh_instance.material_override:
+		mesh_instance.material_override.albedo_color = Color.WHITE
+		mesh_instance.material_override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "scale", Vector3(3, 3, 3), 0.5).set_ease(Tween.EASE_OUT)
+	tween.tween_property(mesh_instance, "modulate:a", 0.0, 0.5) # won't work on 3D, use material
+	if mesh_instance.material_override:
+		tween.tween_property(mesh_instance.material_override, "albedo_color:a", 0.0, 0.5)
+	tween.chain().tween_callback(func(): visible = false; scale = Vector3.ONE)
+
 func _flash_hit() -> void:
 	var mesh_instance = $MeshInstance3D
 	if mesh_instance and mesh_instance.material_override:
