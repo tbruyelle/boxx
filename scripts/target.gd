@@ -8,6 +8,7 @@ signal destroyed
 @export var max_hp: float = 100.0
 var current_hp: float = 100.0
 var target_type: String = "wall"
+var is_dead: bool = false
 
 func _ready() -> void:
 	current_hp = max_hp
@@ -16,14 +17,18 @@ func setup(type: String, hp: float) -> void:
 	target_type = type
 	max_hp = hp
 	current_hp = hp
+	is_dead = false
 	hp_changed.emit(current_hp, max_hp)
 	_update_visual()
 
 func take_damage(amount: float) -> void:
+	if is_dead:
+		return
 	current_hp = maxf(current_hp - amount, 0.0)
 	hp_changed.emit(current_hp, max_hp)
 	_flash_hit()
 	if current_hp <= 0:
+		is_dead = true
 		destroyed.emit()
 
 func _update_visual() -> void:
