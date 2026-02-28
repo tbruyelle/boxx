@@ -15,10 +15,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Key Commands
 
 ```bash
-GODOT="$HOME/.local/share/Steam/steamapps/common/Godot Engine/godot.x11.opt.tools.64"
+make start    # launch the game
+make restart  # kill + relaunch
+make stop     # stop the game
 
-# Run the game (kill previous instance first, then launch)
-ps aux | grep godot | grep -v grep | awk '{print $2}' | xargs kill 2>/dev/null; sleep 1
+# Or manually:
+GODOT="$HOME/.local/share/Steam/steamapps/common/Godot Engine/godot.x11.opt.tools.64"
 "$GODOT" --path /home/tom/src/boxx
 
 # Open in editor
