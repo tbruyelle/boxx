@@ -111,7 +111,7 @@ func _intro_target_slide(config: Dictionary) -> void:
 	# Target slides in from above
 	var target_final = grid.grid_to_world(Vector2i(game_manager.grid_size.x / 2, 0))
 	target_final.y = 1.5
-	target_final.z -= game_manager.cell_size
+	target_final.z -= game_manager.cell_size * 2.5
 	target.position = target_final + Vector3(0, 0, -20)
 	target.setup(config["target_type"], config["target_hp"])
 	target.visible = true
