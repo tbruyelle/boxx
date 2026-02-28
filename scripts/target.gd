@@ -9,6 +9,8 @@ signal destroyed
 var current_hp: float = 100.0
 var target_type: String = "wall"
 var is_dead: bool = false
+var base_color: Color = Color.WHITE
+var _flash_tween: Tween = null
 
 func _ready() -> void:
 	current_hp = max_hp
@@ -40,14 +42,16 @@ func _update_visual() -> void:
 			box.size = Vector3(8.0, 3.0, 1.0)
 			mesh_instance.mesh = box
 			var mat = StandardMaterial3D.new()
-			mat.albedo_color = Color(0.6, 0.35, 0.2)
+			base_color = Color(0.6, 0.35, 0.2)
+			mat.albedo_color = base_color
 			mesh_instance.material_override = mat
 		elif target_type == "monster":
 			var box = BoxMesh.new()
 			box.size = Vector3(3.0, 4.0, 3.0)
 			mesh_instance.mesh = box
 			var mat = StandardMaterial3D.new()
-			mat.albedo_color = Color(0.7, 0.1, 0.1)
+			base_color = Color(0.7, 0.1, 0.1)
+			mat.albedo_color = base_color
 			mesh_instance.material_override = mat
 
 func explode() -> void:
@@ -69,7 +73,8 @@ func explode() -> void:
 func _flash_hit() -> void:
 	var mesh_instance = $MeshInstance3D
 	if mesh_instance and mesh_instance.material_override:
-		var orig_color = mesh_instance.material_override.albedo_color
+		if _flash_tween and _flash_tween.is_valid():
+			_flash_tween.kill()
 		mesh_instance.material_override.albedo_color = Color.WHITE
-		var tween = create_tween()
-		tween.tween_property(mesh_instance.material_override, "albedo_color", orig_color, 0.15)
+		_flash_tween = create_tween()
+		_flash_tween.tween_property(mesh_instance.material_override, "albedo_color", base_color, 0.15)
