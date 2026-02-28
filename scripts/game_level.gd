@@ -17,6 +17,7 @@ enum State { SPLASH, INTRO, PLAYING, GAME_OVER }
 @onready var game_over_panel: Control = $UI/GameOverPanel
 @onready var title_label: Node3D = $TitleLabel
 @onready var press_key_label: Label = $UI/PressKeyLabel
+@onready var music_player: AudioStreamPlayer = $MusicPlayer
 
 var state: int = State.SPLASH
 var time_remaining: float = 60.0
@@ -25,7 +26,30 @@ var title_time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("game_level")
+	_load_music()
+	music_player.finished.connect(func(): music_player.play())
 	_enter_splash()
+
+func _load_music() -> void:
+	var file = FileAccess.open("res://assets/music_loop.wav", FileAccess.READ)
+	if not file:
+		return
+	var bytes = file.get_buffer(file.get_length())
+	file.close()
+	var stream = AudioStreamWAV.new()
+	# Parse WAV header
+	var sample_rate = bytes.decode_u32(24)
+	var bits = bytes.decode_u16(34)
+	# Find data chunk
+	var data_offset = 44
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.stereo = false
+	stream.data = bytes.slice(data_offset)
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_end = (bytes.size() - data_offset) / 2
+	music_player.stream = stream
+	music_player.play()
 
 func _enter_splash() -> void:
 	state = State.SPLASH

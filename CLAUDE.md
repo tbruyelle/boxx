@@ -30,6 +30,11 @@ ps aux | grep godot | grep -v grep | awk '{print $2}' | xargs kill 2>/dev/null; 
 
 **Workflow**: when modifying files, do NOT kill the running game first. Edit files freely while the game runs, then kill+relaunch only when ready to test. After every modification, always relaunch the game (kill+relaunch) so the user can test immediately.
 
+```bash
+# Regenerate music loop
+python3 /home/tom/src/boxx/assets/generate_music.py
+```
+
 ## Architecture
 
 ### Game States (State enum in game_level.gd)
