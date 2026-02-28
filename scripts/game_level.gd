@@ -106,6 +106,8 @@ func _start_playing() -> void:
 	# Connect signals
 	if not player.moved.is_connected(_on_player_moved):
 		player.moved.connect(_on_player_moved)
+	if not player.arrived.is_connected(_on_player_arrived):
+		player.arrived.connect(_on_player_arrived)
 	if not player.fired.is_connected(_on_player_fired):
 		player.fired.connect(_on_player_fired)
 	if not target.hp_changed.is_connected(_on_target_hp_changed):
@@ -149,10 +151,14 @@ func _process(delta: float) -> void:
 		if time_remaining <= 0.0:
 			_trigger_game_over()
 
-func _on_player_moved(old_pos: Vector2i, new_pos: Vector2i) -> void:
+func _on_player_moved(old_pos: Vector2i, _new_pos: Vector2i) -> void:
 	grid.destroy_cell(old_pos)
-	var bonus = grid.get_cell_bonus(new_pos)
-	player.apply_bonus(bonus)
+
+func _on_player_arrived(pos: Vector2i) -> void:
+	var bonus = grid.get_cell_bonus(pos)
+	if bonus != 0:
+		grid.clear_cell_bonus(pos)
+		player.apply_bonus(bonus)
 
 func _on_player_fired(bullet_count: int) -> void:
 	for i in range(bullet_count):
@@ -160,7 +166,7 @@ func _on_player_fired(bullet_count: int) -> void:
 
 func _spawn_bullet(index: int) -> void:
 	var bullet = BULLET_SCENE.instantiate()
-	var offset = Vector3(randf_range(-0.3, 0.3) * index, 0.0, 0.0)
+	var offset = Vector3(randf_range(-0.5, 0.5), randf_range(0.0, 0.3), 0.0)
 	bullet.position = player.position + Vector3(0, 1.0, 0) + offset
 	bullet.setup(target.position + Vector3(0, 1.5, 0), player.bullet_damage)
 	add_child(bullet)

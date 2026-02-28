@@ -17,7 +17,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 GODOT="$HOME/.local/share/Steam/steamapps/common/Godot Engine/godot.x11.opt.tools.64"
 
-# Run the game
+# Run the game (kill previous instance first, then launch)
+ps aux | grep godot | grep -v grep | awk '{print $2}' | xargs kill 2>/dev/null; sleep 1
 "$GODOT" --path /home/tom/src/boxx
 
 # Open in editor
@@ -27,10 +28,7 @@ GODOT="$HOME/.local/share/Steam/steamapps/common/Godot Engine/godot.x11.opt.tool
 "$GODOT" --headless --path /home/tom/src/boxx --check-only 2>&1
 ```
 
-Always kill the running game process before relaunching:
-```bash
-ps aux | grep godot | grep -v grep | awk '{print $2}' | xargs kill 2>/dev/null
-```
+**Workflow**: when modifying files, do NOT kill the running game first. Edit files freely while the game runs, then kill+relaunch only when ready to test. After every modification, always relaunch the game (kill+relaunch) so the user can test immediately.
 
 ## Architecture
 

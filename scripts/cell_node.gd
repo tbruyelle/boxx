@@ -35,6 +35,10 @@ func _update_visual() -> void:
 			2: bonus_label.text = "/2"
 			3: bonus_label.text = "+10"
 
+func clear_bonus() -> void:
+	bonus_type = 0
+	_update_visual()
+
 func destroy() -> void:
 	is_destroyed = true
 	var tween = create_tween()

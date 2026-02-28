@@ -3,6 +3,7 @@ extends Node3D
 ## The player character. Moves on the grid, auto-fires bullets at the target.
 
 signal moved(old_pos: Vector2i, new_pos: Vector2i)
+signal arrived(pos: Vector2i)
 signal fired(bullet_count: int)
 
 @export var base_fire_interval: float = 3.0
@@ -10,7 +11,6 @@ signal fired(bullet_count: int)
 
 var grid_pos: Vector2i = Vector2i.ZERO
 var fire_interval: float = 3.0
-var bonus_bullets: int = 0
 var is_moving: bool = false
 
 @onready var fire_timer: Timer = $FireTimer
@@ -51,7 +51,11 @@ func _animate_move(target_world_pos: Vector3) -> void:
 	is_moving = true
 	var tween = create_tween()
 	tween.tween_property(self, "position", target_world_pos, 0.15).set_ease(Tween.EASE_OUT)
-	tween.tween_callback(func(): is_moving = false)
+	tween.tween_callback(_on_move_finished)
+
+func _on_move_finished() -> void:
+	is_moving = false
+	arrived.emit(grid_pos)
 
 func apply_bonus(bonus: int) -> void:
 	match bonus:
@@ -62,7 +66,7 @@ func apply_bonus(bonus: int) -> void:
 			fire_interval = fire_interval * 2.0
 			fire_timer.wait_time = fire_interval
 		3:  # BULLETS_PLUS_10
-			bonus_bullets += 10
+			fired.emit(10)
 
 func get_fire_rate() -> float:
 	return 1.0 / fire_interval
@@ -71,16 +75,10 @@ func get_time_to_next_shot() -> float:
 	return fire_timer.time_left
 
 func _on_fire_timer_timeout() -> void:
-	var count = 1 + bonus_bullets
-	if bonus_bullets > 0:
-		bonus_bullets = maxi(bonus_bullets - 1, 0)
-		if bonus_bullets == 0:
-			count = 1  # Back to normal next shot
-	fired.emit(count)
+	fired.emit(1)
 
 func reset(start_pos: Vector2i, world_pos: Vector3) -> void:
 	grid_pos = start_pos
 	position = world_pos
 	fire_interval = base_fire_interval
-	bonus_bullets = 0
 	fire_timer.wait_time = fire_interval

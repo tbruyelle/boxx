@@ -82,3 +82,9 @@ func get_cell_bonus(pos: Vector2i) -> int:
 	if cells.has(pos):
 		return cells[pos].bonus
 	return CellBonus.NONE
+
+func clear_cell_bonus(pos: Vector2i) -> void:
+	if cells.has(pos) and cells[pos].bonus != CellBonus.NONE:
+		cells[pos].bonus = CellBonus.NONE
+		if cells[pos].node:
+			cells[pos].node.clear_bonus()
