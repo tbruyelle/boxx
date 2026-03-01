@@ -84,7 +84,7 @@ func _on_move_finished() -> void:
 func apply_bonus(bonus: int) -> void:
 	match bonus:
 		1:  # FIRE_RATE_X2
-			fire_interval = maxf(fire_interval / 2.0, 0.25)
+			fire_interval = fire_interval / 2.0
 			fire_timer.wait_time = fire_interval
 		2:  # FIRE_RATE_HALF
 			fire_interval = fire_interval * 2.0
