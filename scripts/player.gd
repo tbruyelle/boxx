@@ -19,6 +19,30 @@ var is_moving: bool = false
 func _ready() -> void:
 	fire_timer.wait_time = fire_interval
 	fire_timer.timeout.connect(_on_fire_timer_timeout)
+	_setup_sprite()
+
+func _load_texture(path: String) -> ImageTexture:
+	var img := Image.load_from_file(ProjectSettings.globalize_path(path))
+	if img == null:
+		return null
+	var tex := ImageTexture.create_from_image(img)
+	return tex
+
+func _setup_sprite() -> void:
+	var body := $Model/Body as MeshInstance3D
+	var tex := _load_texture("res://assets/player.png")
+	if tex == null:
+		return
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.93, 1.4)
+	body.mesh = quad
+	var mat := StandardMaterial3D.new()
+	mat.albedo_texture = tex
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	body.material_override = mat
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_moving:
