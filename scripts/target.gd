@@ -11,6 +11,11 @@ var target_type: String = "wall"
 var is_dead: bool = false
 var base_color: Color = Color.WHITE
 var _flash_tween: Tween = null
+var _move_time: float = 0.0
+var _move_origin: Vector3 = Vector3.ZERO
+var _moving: bool = false
+var _move_amplitude: float = 0.9
+var _move_speed: float = 0.8
 
 func _ready() -> void:
 	current_hp = max_hp
@@ -26,8 +31,23 @@ func setup(type: String, hp: float) -> void:
 	max_hp = hp
 	current_hp = hp
 	is_dead = false
+	_moving = false
+	_move_time = 0.0
 	hp_changed.emit(current_hp, max_hp)
 	_update_visual()
+
+func start_movement() -> void:
+	if target_type == "monster":
+		_move_origin = position
+		_move_time = 0.0
+		_moving = true
+
+func _process(delta: float) -> void:
+	if not _moving or is_dead:
+		return
+	_move_time += delta * _move_speed
+	position.x = _move_origin.x + _move_amplitude * sin(_move_time)
+	position.z = _move_origin.z + _move_amplitude * sin(_move_time * 2.0) * 0.5
 
 func take_damage(amount: float) -> void:
 	if is_dead:

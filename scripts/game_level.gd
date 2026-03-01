@@ -121,7 +121,10 @@ func _intro_target_slide(config: Dictionary) -> void:
 
 	var tween = create_tween()
 	tween.tween_property(target, "position", target_final, 0.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	tween.tween_callback(_start_playing)
+	tween.tween_callback(func():
+		target.start_movement()
+		_start_playing()
+	)
 
 func _start_playing() -> void:
 	state = State.PLAYING
