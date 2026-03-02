@@ -205,7 +205,8 @@ func _spawn_bullet(index: int) -> void:
 	var bullet = BULLET_SCENE.instantiate()
 	var offset = Vector3(randf_range(-0.5, 0.5), randf_range(0.0, 0.3), 0.0)
 	bullet.position = player.position + Vector3(0, 1.0, 0) + offset
-	bullet.setup(target.position + Vector3(0, 1.5, 0), player.bullet_damage)
+	var target_offset = Vector3(randf_range(-1.0, 1.0), randf_range(0.5, 2.5), randf_range(-0.5, 0.5))
+	bullet.setup(target.position + target_offset, player.bullet_damage)
 	bullet.add_to_group("bullets")
 	add_child(bullet)
 
