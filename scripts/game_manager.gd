@@ -10,16 +10,11 @@ var current_level: int = 1
 var grid_size: Vector2i = Vector2i(8, 10)
 var cell_size: float = 2.0
 
-# Level definitions: target_type, target_hp
-var level_data: Array[Dictionary] = [
-	{"target_type": "monster", "target_hp": 100, "time_limit": 60.0},
-	{"target_type": "monster", "target_hp": 250, "time_limit": 60.0},
-	{"target_type": "monster", "target_hp": 500, "time_limit": 60.0},
-]
+var base_hp: float = 100.0
 
 func get_level_config() -> Dictionary:
-	var idx = clampi(current_level - 1, 0, level_data.size() - 1)
-	return level_data[idx]
+	var hp := base_hp * pow(2, current_level - 1)
+	return {"target_type": "monster", "target_hp": hp, "time_limit": 60.0}
 
 func start_level(level: int) -> void:
 	current_level = level

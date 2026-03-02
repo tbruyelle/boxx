@@ -83,8 +83,8 @@ func _on_move_finished() -> void:
 
 func apply_bonus(bonus: int) -> void:
 	match bonus:
-		1:  # FIRE_RATE_X2
-			fire_interval = fire_interval / 2.0
+		1:  # FIRE_RATE_X1.2
+			fire_interval = fire_interval / 1.2
 			fire_timer.wait_time = fire_interval
 		2:  # FIRE_RATE_HALF
 			fire_interval = fire_interval * 2.0
@@ -104,5 +104,3 @@ func _on_fire_timer_timeout() -> void:
 func reset(start_pos: Vector2i, world_pos: Vector3) -> void:
 	grid_pos = start_pos
 	position = world_pos
-	fire_interval = base_fire_interval
-	fire_timer.wait_time = fire_interval

@@ -10,6 +10,7 @@ enum State { SPLASH, INTRO, PLAYING, GAME_OVER }
 @onready var player: Node3D = $Player
 @onready var target: Node3D = $Target
 @onready var hp_bar: ProgressBar = $UI/HPBar
+@onready var hp_label: Label = $UI/HPBar/HPLabel
 @onready var level_label: Label = $UI/LevelLabel
 @onready var fire_rate_label: Label = $UI/FireRateLabel
 @onready var timer_label: Label = $UI/TimerLabel
@@ -118,6 +119,7 @@ func _intro_target_slide(config: Dictionary) -> void:
 
 	hp_bar.max_value = config["target_hp"]
 	hp_bar.value = config["target_hp"]
+	hp_label.text = "%d / %d" % [ceili(config["target_hp"]), ceili(config["target_hp"])]
 
 	var tween = create_tween()
 	tween.tween_property(target, "position", target_final, 0.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
@@ -146,7 +148,7 @@ func _start_playing() -> void:
 		target.destroyed.connect(_on_target_destroyed)
 
 	player.set_process_unhandled_input(true)
-	player.fire_timer.start()
+	player.fire_timer.start(0)
 
 func _trigger_game_over() -> void:
 	state = State.GAME_OVER
@@ -214,6 +216,7 @@ func on_bullet_hit(damage: float) -> void:
 
 func _on_target_hp_changed(current: float, max_val: float) -> void:
 	hp_bar.value = current
+	hp_label.text = "%d / %d" % [ceili(current), ceili(max_val)]
 
 func _on_target_died() -> void:
 	# Immediately freeze player and remove all bullets
