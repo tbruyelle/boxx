@@ -62,10 +62,12 @@ func _random_bonus(pos: Vector2i) -> int:
 func get_start_position() -> Vector2i:
 	return Vector2i(grid_size.x / 2, grid_size.y - 1)
 
+@export var grid_offset_z: float = 6.0
+
 func grid_to_world(pos: Vector2i) -> Vector3:
 	var offset_x = -(grid_size.x - 1) * cell_size / 2.0
 	var offset_z = -(grid_size.y - 1) * cell_size / 2.0
-	return Vector3(pos.x * cell_size + offset_x, 0.0, pos.y * cell_size + offset_z)
+	return Vector3(pos.x * cell_size + offset_x, 0.0, pos.y * cell_size + offset_z + grid_offset_z)
 
 func is_valid_move(pos: Vector2i) -> bool:
 	if not cells.has(pos):

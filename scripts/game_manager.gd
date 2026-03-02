@@ -12,8 +12,8 @@ var cell_size: float = 2.0
 
 # Level definitions: target_type, target_hp
 var level_data: Array[Dictionary] = [
-	{"target_type": "wall", "target_hp": 100, "time_limit": 60.0},
-	{"target_type": "wall", "target_hp": 250, "time_limit": 60.0},
+	{"target_type": "monster", "target_hp": 100, "time_limit": 60.0},
+	{"target_type": "monster", "target_hp": 250, "time_limit": 60.0},
 	{"target_type": "monster", "target_hp": 500, "time_limit": 60.0},
 ]
 

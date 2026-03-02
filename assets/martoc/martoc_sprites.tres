@@ -1,0 +1,115 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://db7a7vgp8f6w7"]
+
+[ext_resource type="Texture2D" uid="uid://b1hc52qlkb8xt" path="res://assets/martoc/00_walk_1.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://dtpposql0l1px" path="res://assets/martoc/01_walk_2.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://d3aicihc6x2dd" path="res://assets/martoc/02_walk_3.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://bn5d1nlj274k1" path="res://assets/martoc/03_walk_4.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://bm0ufw8t15pfo" path="res://assets/martoc/04_walk_5.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://3vie2byhmtfv" path="res://assets/martoc/06_windup_1.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://cxsmb0gnjkpla" path="res://assets/martoc/07_windup_2.png" id="8"]
+[ext_resource type="Texture2D" uid="uid://bhu0s0upu5opf" path="res://assets/martoc/08_ready.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://bsaghsi2l2kqe" path="res://assets/martoc/09_swing_1.png" id="10"]
+[ext_resource type="Texture2D" uid="uid://bgryw23mad8fe" path="res://assets/martoc/10_swing_2.png" id="11"]
+[ext_resource type="Texture2D" uid="uid://crgn1ojmjsv37" path="res://assets/martoc/11_release.png" id="12"]
+[ext_resource type="Texture2D" uid="uid://4x2qmsqcihmd" path="res://assets/martoc/12_hammer_closed.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://7roi7pb65qb8" path="res://assets/martoc/13_hammer_large.png" id="14"]
+[ext_resource type="Texture2D" uid="uid://c4oakfwbk67my" path="res://assets/martoc/14_follow_through_1.png" id="15"]
+[ext_resource type="Texture2D" uid="uid://b5r666h88ss08" path="res://assets/martoc/15_follow_through_2.png" id="16"]
+[ext_resource type="Texture2D" uid="uid://cklv7dqvmdc2t" path="res://assets/martoc/16_recovery_1.png" id="17"]
+[ext_resource type="Texture2D" uid="uid://b18b8gffn2b5l" path="res://assets/martoc/17_recovery_2.png" id="18"]
+[ext_resource type="Texture2D" uid="uid://7a6q8ah2vumk" path="res://assets/martoc/18_extra_1.png" id="19"]
+[ext_resource type="Texture2D" uid="uid://bgwborueslxrr" path="res://assets/martoc/19_extra_2.png" id="20"]
+[ext_resource type="Texture2D" uid="uid://d0u6mbknbm2kq" path="res://assets/martoc/20_extra_3.png" id="21"]
+[ext_resource type="Texture2D" uid="uid://dpwtuf77h00gg" path="res://assets/martoc/21_extra_4.png" id="22"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22")
+}],
+"loop": false,
+"name": &"death",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21")
+}],
+"loop": false,
+"name": &"recover",
+"speed": 10.0
+}]

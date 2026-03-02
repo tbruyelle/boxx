@@ -1,30 +1,26 @@
 extends Node3D
 
-## The target at the top of the grid (wall or monster). Has HP and can be destroyed.
+## The target at the top of the grid (monster). Has HP and can be destroyed.
 
 signal hp_changed(current_hp: float, max_hp: float)
+signal died
 signal destroyed
 
 @export var max_hp: float = 100.0
 var current_hp: float = 100.0
-var target_type: String = "wall"
+var target_type: String = "monster"
 var is_dead: bool = false
-var base_color: Color = Color.WHITE
-var _flash_tween: Tween = null
+var _hit_tween: Tween = null
 var _move_time: float = 0.0
 var _move_origin: Vector3 = Vector3.ZERO
 var _moving: bool = false
 var _move_amplitude: float = 0.9
-var _move_speed: float = 0.8
+var _move_speed: float = 0.4
+var _animated_sprite: AnimatedSprite3D = null
+var _base_scale: Vector3 = Vector3.ONE
 
 func _ready() -> void:
 	current_hp = max_hp
-
-func _load_texture(path: String) -> ImageTexture:
-	var img := Image.load_from_file(ProjectSettings.globalize_path(path))
-	if img == null:
-		return null
-	return ImageTexture.create_from_image(img)
 
 func setup(type: String, hp: float) -> void:
 	target_type = type
@@ -37,10 +33,11 @@ func setup(type: String, hp: float) -> void:
 	_update_visual()
 
 func start_movement() -> void:
-	if target_type == "monster":
-		_move_origin = position
-		_move_time = 0.0
-		_moving = true
+	_move_origin = position
+	_move_time = 0.0
+	_moving = true
+	if _animated_sprite:
+		_animated_sprite.play("idle")
 
 func _process(delta: float) -> void:
 	if not _moving or is_dead:
@@ -54,68 +51,65 @@ func take_damage(amount: float) -> void:
 		return
 	current_hp = maxf(current_hp - amount, 0.0)
 	hp_changed.emit(current_hp, max_hp)
-	_flash_hit()
+	_on_hit()
 	if current_hp <= 0:
 		is_dead = true
+		died.emit()
+		if _animated_sprite:
+			_animated_sprite.play("death")
+			_animated_sprite.animation_finished.connect(_on_death_finished, CONNECT_ONE_SHOT)
+		else:
+			destroyed.emit()
+
+func _on_death_finished() -> void:
+	# Fade out after death animation completes
+	if not _animated_sprite:
 		destroyed.emit()
+		return
+	var tween := create_tween()
+	tween.tween_property(_animated_sprite, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(func():
+		visible = false
+		destroyed.emit()
+	)
 
 func _update_visual() -> void:
-	var mesh_instance = $MeshInstance3D
-	if not mesh_instance:
-		return
-	if target_type == "wall":
-		var box = BoxMesh.new()
-		box.size = Vector3(8.0, 3.0, 1.0)
-		mesh_instance.mesh = box
-		var mat = StandardMaterial3D.new()
-		var tex = _load_texture("res://assets/wall.png")
-		if tex:
-			mat.albedo_texture = tex
-			mat.uv1_scale = Vector3(4.0, 2.0, 1.0)
-		else:
-			mat.albedo_color = Color(0.6, 0.35, 0.2)
-		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		base_color = Color.WHITE
-		mat.albedo_color = base_color
-		mesh_instance.material_override = mat
-	elif target_type == "monster":
-		var quad = QuadMesh.new()
-		quad.size = Vector2(4.0, 4.0)
-		mesh_instance.mesh = quad
-		var mat = StandardMaterial3D.new()
-		var tex = _load_texture("res://assets/monster.png")
-		if tex:
-			mat.albedo_texture = tex
-		else:
-			mat.albedo_color = Color(0.7, 0.1, 0.1)
-		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
-		mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		base_color = Color.WHITE
-		mat.albedo_color = base_color
-		mesh_instance.material_override = mat
+	# Hide the MeshInstance3D (kept for scene compatibility)
+	var mesh_instance := $MeshInstance3D as MeshInstance3D
+	if mesh_instance:
+		mesh_instance.visible = false
+	# Remove old animated sprite if any
+	if _animated_sprite:
+		_animated_sprite.queue_free()
+		_animated_sprite = null
+	var sprite_frames := load("res://assets/martoc/martoc_sprites.tres") as SpriteFrames
+	_animated_sprite = AnimatedSprite3D.new()
+	_animated_sprite.sprite_frames = sprite_frames
+	_animated_sprite.pixel_size = 0.045
+	_animated_sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	_animated_sprite.no_depth_test = false
+	_animated_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_animated_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_OPAQUE_PREPASS
+	_animated_sprite.modulate = Color.WHITE
+	add_child(_animated_sprite)
+	_animated_sprite.play("idle")
+	_base_scale = _animated_sprite.scale
 
 func explode() -> void:
-	var mesh_instance = $MeshInstance3D
-	if not mesh_instance:
-		return
-	if mesh_instance.material_override:
-		mesh_instance.material_override.albedo_color = Color(3, 3, 3)
-		mesh_instance.material_override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	var tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(self, "scale", Vector3(3, 3, 3), 0.5).set_ease(Tween.EASE_OUT)
-	if mesh_instance.material_override:
-		tween.tween_property(mesh_instance.material_override, "albedo_color:a", 0.0, 0.5)
-	tween.chain().tween_callback(func(): visible = false; scale = Vector3.ONE)
+	# Death animation + fade handled by _on_death_finished
+	pass
 
-func _flash_hit() -> void:
-	var mesh_instance = $MeshInstance3D
-	if mesh_instance and mesh_instance.material_override:
-		if _flash_tween and _flash_tween.is_valid():
-			_flash_tween.kill()
-		mesh_instance.material_override.albedo_color = Color(3, 3, 3)
-		_flash_tween = create_tween()
-		_flash_tween.tween_property(mesh_instance.material_override, "albedo_color", base_color, 0.15)
+func _on_hit() -> void:
+	if not _animated_sprite:
+		return
+	if _hit_tween and _hit_tween.is_valid():
+		_hit_tween.kill()
+	# Red flash + squeeze (scale X shrink, Y stretch) + shake
+	_animated_sprite.modulate = Color(2.0, 0.3, 0.3)
+	_animated_sprite.scale = _base_scale * Vector3(0.8, 1.2, 1.0)
+	_animated_sprite.position.x = randf_range(-0.1, 0.1)
+	_hit_tween = create_tween()
+	_hit_tween.set_parallel(true)
+	_hit_tween.tween_property(_animated_sprite, "modulate", Color.WHITE, 0.2).set_ease(Tween.EASE_OUT)
+	_hit_tween.tween_property(_animated_sprite, "scale", _base_scale, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	_hit_tween.tween_property(_animated_sprite, "position:x", 0.0, 0.15).set_ease(Tween.EASE_OUT)

@@ -111,7 +111,7 @@ func _intro_target_slide(config: Dictionary) -> void:
 	# Target slides in from above
 	var target_final = grid.grid_to_world(Vector2i(game_manager.grid_size.x / 2, 0))
 	target_final.y = 1.5
-	target_final.z -= game_manager.cell_size * 2.5
+	target_final.z -= game_manager.cell_size * 2.5 + grid.grid_offset_z
 	target.position = target_final + Vector3(0, 0, -20)
 	target.setup(config["target_type"], config["target_hp"])
 	target.visible = true
@@ -140,6 +140,8 @@ func _start_playing() -> void:
 		player.fired.connect(_on_player_fired)
 	if not target.hp_changed.is_connected(_on_target_hp_changed):
 		target.hp_changed.connect(_on_target_hp_changed)
+	if not target.died.is_connected(_on_target_died):
+		target.died.connect(_on_target_died)
 	if not target.destroyed.is_connected(_on_target_destroyed):
 		target.destroyed.connect(_on_target_destroyed)
 
@@ -202,6 +204,7 @@ func _spawn_bullet(index: int) -> void:
 	var offset = Vector3(randf_range(-0.5, 0.5), randf_range(0.0, 0.3), 0.0)
 	bullet.position = player.position + Vector3(0, 1.0, 0) + offset
 	bullet.setup(target.position + Vector3(0, 1.5, 0), player.bullet_damage)
+	bullet.add_to_group("bullets")
 	add_child(bullet)
 
 func on_bullet_hit(damage: float) -> void:
@@ -212,18 +215,17 @@ func on_bullet_hit(damage: float) -> void:
 func _on_target_hp_changed(current: float, max_val: float) -> void:
 	hp_bar.value = current
 
-func _on_target_destroyed() -> void:
-	# Pause gameplay
+func _on_target_died() -> void:
+	# Immediately freeze player and remove all bullets
 	state = State.INTRO
 	player.fire_timer.stop()
 	player.set_process_unhandled_input(false)
-
-	# Explode target
+	for bullet in get_tree().get_nodes_in_group("bullets"):
+		bullet.queue_free()
 	sfx.play("explosion", -6.0)
-	target.explode()
-	await get_tree().create_timer(0.8).timeout
 
-	# Victory jingle
+func _on_target_destroyed() -> void:
+	# Called after death animation + fade out
 	sfx.play("victory", -2.0)
 	await get_tree().create_timer(1.0).timeout
 
