@@ -22,13 +22,17 @@ var _base_scale: Vector3 = Vector3.ONE
 func _ready() -> void:
 	current_hp = max_hp
 
-func setup(type: String, hp: float) -> void:
+var _sprite_path: String = "res://assets/martoc/martoc_sprites.tres"
+
+func setup(type: String, hp: float, sprite_path: String = "") -> void:
 	target_type = type
 	max_hp = hp
 	current_hp = hp
 	is_dead = false
 	_moving = false
 	_move_time = 0.0
+	if sprite_path != "":
+		_sprite_path = sprite_path
 	hp_changed.emit(current_hp, max_hp)
 	_update_visual()
 
@@ -82,7 +86,7 @@ func _update_visual() -> void:
 	if _animated_sprite:
 		_animated_sprite.queue_free()
 		_animated_sprite = null
-	var sprite_frames := load("res://assets/martoc/martoc_sprites.tres") as SpriteFrames
+	var sprite_frames := load(_sprite_path) as SpriteFrames
 	_animated_sprite = AnimatedSprite3D.new()
 	_animated_sprite.sprite_frames = sprite_frames
 	_animated_sprite.pixel_size = 0.045

@@ -114,7 +114,7 @@ func _intro_target_slide(config: Dictionary) -> void:
 	target_final.y = 1.5
 	target_final.z -= game_manager.cell_size * 2.5 + grid.grid_offset_z
 	target.position = target_final + Vector3(0, 0, -20)
-	target.setup(config["target_type"], config["target_hp"])
+	target.setup(config["target_type"], config["target_hp"], config["sprite"])
 	target.visible = true
 
 	hp_bar.max_value = config["target_hp"]
